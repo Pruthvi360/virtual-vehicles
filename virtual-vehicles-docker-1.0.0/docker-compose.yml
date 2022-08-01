@@ -1,0 +1,62 @@
+########################################################################
+#
+# title:       Docker Compose YAML file for Virtual-Vehicles Project
+# author:      Gary A. Stafford (https://programmaticponderings.com)
+# url:         https://github.com/garystafford/virtual-vehicles-docker  
+# description: Builds (4) images, pulls (2) images, and builds (9) containers,
+#              for the Virtual-Vehicles Java microservices example REST API
+# to run:      docker-compose -p virtualvehicles up -d
+#
+########################################################################
+
+graphite:
+  image: hopsoft/graphite-statsd:latest
+  ports:
+   - "8481:80"
+
+mongoAuthentication:
+  image: mongo:latest
+
+mongoValet:
+  image: mongo:latest
+
+mongoMaintenance:
+  image: mongo:latest
+
+mongoVehicle:
+  image: mongo:latest
+
+authentication:
+  build: authentication/
+  ports:
+   - "8587:8587"
+  links:
+   - graphite
+   - mongoAuthentication
+
+valet:
+  build: valet/
+  ports:
+   - "8585:8585"
+  links:
+   - graphite
+   - mongoValet
+   - authentication
+
+maintenance:
+  build: maintenance/
+  ports:
+   - "8583:8583"
+  links:
+   - graphite
+   - mongoMaintenance
+   - authentication
+
+vehicle:
+  build: vehicle/
+  ports:
+   - "8581:8581"
+  links:
+   - graphite
+   - mongoVehicle
+   - authentication
